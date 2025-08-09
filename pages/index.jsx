@@ -450,7 +450,7 @@ export default function CleanSlateApp() {
   useEffect(() => {
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const isInWebAppiOS = (window.navigator as any).standalone === true;
+    const isInWebAppiOS = window.navigator && window.navigator.standalone === true;
     setIsInstalled(isStandalone || isInWebAppiOS);
 
     const handleBeforeInstallPrompt = (e) => {
