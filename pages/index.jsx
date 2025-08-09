@@ -1,4 +1,4 @@
-// pages/index.jsx
+// pages/index.jsx - Complete CleanSlate Application
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Mail, 
@@ -6,7 +6,7 @@ import {
   DollarSign, 
   Clock, 
   AlertTriangle, 
-  Home as HomeIcon, // Renamed to avoid conflict
+  Home as HomeIcon,
   BarChart3, 
   CheckCircle, 
   X, 
@@ -18,7 +18,10 @@ import {
   Calendar, 
   Search, 
   Eye, 
-  EyeOff 
+  EyeOff,
+  Filter,
+  Plus,
+  Play
 } from 'lucide-react';
 
 const defaultData = {
@@ -46,11 +49,14 @@ const defaultData = {
     { id: 4, sender: 'Medium', type: 'newsletter', frequency: 'weekly', unsubscribed: true, emailsPerWeek: 2, category: 'Reading', importance: 'high' },
     { id: 5, sender: 'Udemy', type: 'promotional', frequency: 'weekly', unsubscribed: false, emailsPerWeek: 5, category: 'Education', importance: 'medium' },
     { id: 6, sender: 'LinkedIn', type: 'notification', frequency: 'daily', unsubscribed: false, emailsPerWeek: 10, category: 'Professional', importance: 'high' },
+    { id: 7, sender: 'RetailMeNot', type: 'promotional', frequency: 'daily', unsubscribed: false, emailsPerWeek: 12, category: 'Shopping', importance: 'low' },
+    { id: 8, sender: 'Coursera', type: 'newsletter', frequency: 'weekly', unsubscribed: false, emailsPerWeek: 2, category: 'Education', importance: 'high' }
   ],
   insights: [
     { id: 1, type: 'warning', title: 'Unused Adobe Creative Cloud', message: 'You haven\'t used Adobe CC in 3 months. Consider pausing to save $52.99/month.', impact: 52.99 },
     { id: 2, type: 'tip', title: 'Annual Billing Savings', message: 'Switch LinkedIn Premium to annual billing to save 25% ($89.97/year).', impact: 89.97 },
-    { id: 3, type: 'success', title: 'Great Progress!', message: 'You\'ve already saved $247.80 this year. You\'re 83% to your $300 goal!', impact: 0 }
+    { id: 3, type: 'success', title: 'Great Progress!', message: 'You\'ve already saved $247.80 this year. You\'re 83% to your $300 goal!', impact: 0 },
+    { id: 4, type: 'warning', title: 'High Email Volume', message: 'You receive 43 promotional emails per week. Consider unsubscribing from low-priority senders.', impact: 0 }
   ]
 };
 
@@ -83,7 +89,7 @@ const StatCard = ({ title, value, icon: Icon, className = '', subtitle = '', tre
   </div>
 );
 
-const SubscriptionCard = ({ subscription, onCancel, onPause, onActivate }) => {
+const SubscriptionCard = ({ subscription, onCancel, onPause, onActivate, isCompact = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -122,6 +128,29 @@ const SubscriptionCard = ({ subscription, onCancel, onPause, onActivate }) => {
       setIsLoading(false);
     }
   };
+
+  if (isCompact) {
+    return (
+      <div className={`p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${getStatusColor()}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl">{subscription.logo}</span>
+            <div>
+              <h4 className="font-semibold text-gray-900">{subscription.name}</h4>
+              <div className="flex items-center space-x-2">
+                {getStatusIcon()}
+                <span className="text-sm capitalize text-gray-700">{subscription.status}</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-lg text-gray-900">${subscription.amount}</p>
+            <p className="text-xs text-gray-500">per month</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${getStatusColor()}`}>
@@ -196,9 +225,10 @@ const SubscriptionCard = ({ subscription, onCancel, onPause, onActivate }) => {
               <button
                 onClick={() => handleAction('activate')}
                 disabled={isLoading}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors disabled:opacity-50 font-medium shadow-sm"
+                className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors disabled:opacity-50 font-medium shadow-sm flex items-center space-x-1"
               >
-                {isLoading ? 'Processing...' : 'Reactivate'}
+                <Play className="h-4 w-4" />
+                <span>{isLoading ? 'Processing...' : 'Reactivate'}</span>
               </button>
             )}
             <button
@@ -261,7 +291,7 @@ const InsightCard = ({ insight, onDismiss }) => {
   );
 };
 
-export default function CleanSlateApp() { // Renamed from Home to CleanSlateApp
+export default function CleanSlateApp() {
   const [data, setData] = useState(appState);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(false);
@@ -368,7 +398,7 @@ export default function CleanSlateApp() { // Renamed from Home to CleanSlateApp
         analysis: `Based on your subscription analysis, here are my top 3 recommendations:
 
 1. **Cancel Adobe Creative Cloud** - You haven't used it in 3 months, saving $52.99/month ($635.88/year)
-2. **Switch to Annual Billing** - LinkedIn Premium offers 25% savings annually, saving $89.97/year
+2. **Switch to Annual Billing** - LinkedIn Premium offers 25% savings annually, saving $89.97/year  
 3. **Review Disney+** - Last used 6 months ago, consider sharing with family or canceling to save $7.99/month
 
 **Total potential savings: $60.98/month or $731.76/year**`,
@@ -432,7 +462,7 @@ Best regards,
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex space-x-8 overflow-x-auto">
             {[
-              { id: 'dashboard', label: 'Dashboard', icon: HomeIcon }, // Using renamed HomeIcon
+              { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
               { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
               { id: 'emails', label: 'Email Cleanup', icon: Mail },
               { id: 'analytics', label: 'Analytics', icon: BarChart3 }
@@ -497,18 +527,635 @@ Best regards,
               />
             </div>
 
-            {/* Rest of your dashboard content */}
-            <div className="text-center py-8">
-              <p className="text-gray-600">Dashboard content continues here...</p>
-              <p className="text-sm text-gray-500 mt-2">Add the remaining sections as needed</p>
+            {/* Insights Section */}
+            {data.insights && data.insights.length > 0 && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                    <Zap className="h-6 w-6 text-blue-500 mr-3" />
+                    Smart Insights & Recommendations
+                  </h3>
+                  <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    {data.insights.length} insights
+                  </span>
+                </div>
+                
+                <div className="space-y-4">
+                  {data.insights.map(insight => (
+                    <InsightCard
+                      key={insight.id}
+                      insight={insight}
+                      onDismiss={dismissInsight}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Priority Actions */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                  <AlertTriangle className="h-6 w-6 text-orange-500 mr-3" />
+                  Priority Actions - High Impact
+                </h3>
+                <span className="text-sm text-gray-500 bg-gradient-to-r from-orange-100 to-red-100 px-3 py-1 rounded-full font-medium">
+                  Save up to ${analytics.potentialSavings.toFixed(2)}/month
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {data.subscriptions
+                  .filter(s => s.status === 'forgotten' || s.status === 'unused')
+                  .slice(0, 4)
+                  .map(sub => (
+                    <div key={sub.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 rounded-xl border-2 border-red-200 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-3xl bg-white p-2 rounded-lg shadow-sm">{sub.logo}</div>
+                        <div>
+                          <p className="font-bold text-gray-900">{sub.name}</p>
+                          <p className="text-sm text-gray-600">
+                            {sub.status === 'forgotten' ? '🚨 Forgotten' : '⚠️ Unused'} • Last used: {sub.lastUsed}
+                          </p>
+                          <p className="text-sm font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full inline-block mt-1">
+                            Save ${sub.amount}/month
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col space-y-2">
+                        <button 
+                          onClick={() => pauseSubscription(sub.id)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors font-medium shadow-sm"
+                        >
+                          Pause
+                        </button>
+                        <button 
+                          onClick={() => cancelSubscription(sub.id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition-colors font-medium shadow-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              
+              {analytics.yearlyDiscount > 0 && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                  <h4 className="font-bold text-green-800 mb-2 flex items-center">
+                    <Calendar className="h-5 w-5 mr-2" />
+                    Annual Billing Opportunities
+                  </h4>
+                  <p className="text-sm text-green-700">
+                    You could save ${analytics.yearlyDiscount.toFixed(2)} annually by switching to yearly billing for eligible subscriptions.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* AI Assistant */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center">
+                <span className="text-2xl mr-3">🤖</span>
+                AI Financial Assistant
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Get personalized recommendations for optimizing your subscriptions and reducing digital clutter.
+              </p>
+              <div className="flex flex-wrap gap-3 mb-4">
+                <button 
+                  onClick={() => generateAIResponse(`Analyze my subscriptions: ${JSON.stringify(data.subscriptions.map(s => ({name: s.name, amount: s.amount, status: s.status, lastUsed: s.lastUsed})))}. Give me 3 specific recommendations to save money.`, 'analysis')}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  {loading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Analyzing...</span>
+                    </div>
+                  ) : 'Get Savings Recommendations'}
+                </button>
+                <button 
+                  onClick={() => generateAIResponse('Write a polite email template to pause a subscription temporarily due to budget constraints.', 'email')}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  Email Template
+                </button>
+                <button 
+                  onClick={() => setAiResult(null)}
+                  className="bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Clear
+                </button>
+              </div>
+              {aiResult && (
+                <div className="mt-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200 p-6 rounded-xl">
+                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <Zap className="h-5 w-5 text-blue-500 mr-2" />
+                    AI Recommendation:
+                  </h4>
+                  <div className="text-gray-800 whitespace-pre-wrap font-medium leading-relaxed">{aiResult}</div>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Add other tabs content as needed */}
-        {activeTab !== 'dashboard' && (
-          <div className="text-center py-8">
-            <p className="text-gray-600">Content for {activeTab} tab</p>
+        {activeTab === 'subscriptions' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    Subscription Management
+                  </h2>
+                  <p className="text-gray-600">Manage all your subscriptions in one place</p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mt-4 lg:mt-0">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      type="text"
+                      placeholder="Search subscriptions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="unused">Unused</option>
+                    <option value="forgotten">Forgotten</option>
+                    <option value="paused">Paused</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="amount">Sort by Amount</option>
+                    <option value="name">Sort by Name</option>
+                    <option value="status">Sort by Status</option>
+                    <option value="category">Sort by Category</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl border border-green-200">
+                  <p className="text-2xl font-bold text-green-600">{analytics.activeSubscriptions}</p>
+                  <p className="text-xs text-gray-600 font-medium">Active</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-orange-100 rounded-xl border border-yellow-200">
+                  <p className="text-2xl font-bold text-yellow-600">{analytics.unusedSubscriptions}</p>
+                  <p className="text-xs text-gray-600 font-medium">Unused</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200">
+                  <p className="text-2xl font-bold text-red-600">{analytics.forgottenSubscriptions}</p>
+                  <p className="text-xs text-gray-600 font-medium">Forgotten</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <p className="text-2xl font-bold text-blue-600">{analytics.pausedSubscriptions}</p>
+                  <p className="text-xs text-gray-600 font-medium">Paused</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <p className="text-2xl font-bold text-gray-600">{analytics.cancelledSubscriptions}</p>
+                  <p className="text-xs text-gray-600 font-medium">Cancelled</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                  <p className="text-xl font-bold text-purple-600">${analytics.potentialSavings.toFixed(0)}</p>
+                  <p className="text-xs text-gray-600 font-medium">Savings</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Subscription Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredSubscriptions.map(subscription => (
+                <SubscriptionCard
+                  key={subscription.id}
+                  subscription={subscription}
+                  onCancel={cancelSubscription}
+                  onPause={pauseSubscription}
+                  onActivate={activateSubscription}
+                />
+              ))}
+            </div>
+            
+            {filteredSubscriptions.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No subscriptions found</h3>
+                <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'emails' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">Email Cleanup & Management</h2>
+              
+              {/* Email Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-xl border-2 border-red-200">
+                  <h4 className="font-semibold text-red-800 mb-2">Weekly Email Volume</h4>
+                  <p className="text-3xl font-bold text-red-600">{analytics.emailsPerWeek}</p>
+                  <p className="text-sm text-red-600 font-medium">promotional emails</p>
+                </div>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">Cleaned Up</h4>
+                  <p className="text-3xl font-bold text-green-600">{data.emails.filter(e => e.unsubscribed).length}</p>
+                  <p className="text-sm text-green-600 font-medium">unsubscribed senders</p>
+                </div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">Time Saved</h4>
+                  <p className="text-3xl font-bold text-blue-600">{Math.round(data.emails.filter(e => e.unsubscribed).length * 10)}</p>
+                  <p className="text-sm text-blue-600 font-medium">minutes per week</p>
+                </div>
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border-2 border-purple-200">
+                  <h4 className="font-semibold text-purple-800 mb-2">Cleanup Progress</h4>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {Math.round((data.emails.filter(e => e.unsubscribed).length / data.emails.length) * 100)}%
+                  </p>
+                  <p className="text-sm text-purple-600 font-medium">completed</p>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="mb-6 flex flex-wrap gap-3">
+                <button
+                  onClick={() => {
+                    const highVolumeEmails = data.emails.filter(e => !e.unsubscribed && e.emailsPerWeek > 5);
+                    highVolumeEmails.forEach(email => unsubscribeEmail(email.id));
+                  }}
+                  className="bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  Unsubscribe High Volume (5+ emails/week)
+                </button>
+                <button
+                  onClick={() => {
+                    const lowImportanceEmails = data.emails.filter(e => !e.unsubscribed && e.importance === 'low');
+                    lowImportanceEmails.forEach(email => unsubscribeEmail(email.id));
+                  }}
+                  className="bg-orange-500 text-white px-6 py-3 rounded-xl hover:bg-orange-600 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  Unsubscribe Low Priority
+                </button>
+              </div>
+
+              {/* Email List */}
+              <div className="space-y-4">
+                {data.emails.map(email => (
+                  <div key={email.id} className={`p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
+                    email.unsubscribed 
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
+                      : 'bg-gradient-to-r from-red-50 to-orange-50 border-red-200'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h4 className="font-bold text-gray-900 text-lg">{email.sender}</h4>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            email.type === 'promotional' ? 'bg-red-100 text-red-800' : 
+                            email.type === 'newsletter' ? 'bg-blue-100 text-blue-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {email.type}
+                          </span>
+                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full font-medium">
+                            {email.category}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            email.importance === 'high' ? 'bg-red-100 text-red-800' :
+                            email.importance === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {email.importance} priority
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-6 text-sm text-gray-600">
+                          <span className="font-medium">{email.emailsPerWeek} emails/week</span>
+                          <span>• {email.frequency} frequency</span>
+                          <span>• ~{email.emailsPerWeek * 2} min/week time cost</span>
+                        </div>
+                        {email.unsubscribed && (
+                          <p className="text-sm text-green-600 font-bold mt-2 flex items-center">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Successfully unsubscribed
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex space-x-3">
+                        {email.unsubscribed ? (
+                          <button
+                            onClick={() => resubscribeEmail(email.id)}
+                            className="bg-blue-500 text-white px-6 py-3 rounded-xl text-sm hover:bg-blue-600 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                          >
+                            Resubscribe
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => unsubscribeEmail(email.id)}
+                            className="bg-red-500 text-white px-6 py-3 rounded-xl text-sm hover:bg-red-600 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                          >
+                            Unsubscribe
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="space-y-8 animate-fade-in">
+            {/* Analytics Header */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Advanced Analytics Dashboard</h2>
+              <p className="text-gray-600">Comprehensive insights into your digital spending patterns and optimization opportunities.</p>
+            </div>
+
+            {/* Analytics Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Optimization Score */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold mb-6 flex items-center">
+                  <span className="text-green-500 mr-3">📊</span>
+                  Digital Health Score
+                </h3>
+                <div className="text-center mb-6">
+                  <div className="relative w-32 h-32 mx-auto mb-4">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50" cy="50" r="40"
+                        fill="none" stroke="#e5e7eb" strokeWidth="8"
+                      />
+                      <circle
+                        cx="50" cy="50" r="40"
+                        fill="none" stroke="#3b82f6" strokeWidth="8"
+                        strokeDasharray={`${(analytics.activeSubscriptions / analytics.totalSubscriptions) * 251.2} 251.2`}
+                        className="transition-all duration-1000 ease-out"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-blue-600">
+                        {Math.round(((analytics.activeSubscriptions / analytics.totalSubscriptions) * 100))}%
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 font-medium">Subscription Efficiency</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-sm font-medium">Active subscriptions</span>
+                    <span className="font-bold text-green-600">{analytics.activeSubscriptions}/{analytics.totalSubscriptions}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <span className="text-sm font-medium">Monthly savings opportunity</span>
+                    <span className="font-bold text-orange-600">${analytics.potentialSavings.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span className="text-sm font-medium">Email cleanup progress</span>
+                    <span className="font-bold text-purple-600">
+                      {Math.round((data.emails.filter(e => e.unsubscribed).length / data.emails.length) * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-sm font-medium">Annual billing savings</span>
+                    <span className="font-bold text-blue-600">${analytics.yearlyDiscount.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Breakdown */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold mb-6">Spending by Category</h3>
+                <div className="space-y-4">
+                  {Object.entries(
+                    data.subscriptions
+                      .filter(s => s.status !== 'cancelled')
+                      .reduce((acc, sub) => {
+                        acc[sub.category] = (acc[sub.category] || 0) + sub.amount;
+                        return acc;
+                      }, {})
+                  )
+                    .sort(([,a], [,b]) => b - a)
+                    .map(([category, amount], index) => {
+                      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+                      const percentage = (amount / analytics.monthlySpend) * 100;
+                      return (
+                        <div key={category} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-4 h-4 rounded-full`} style={{backgroundColor: colors[index % colors.length]}}></div>
+                              <span className="font-medium">{category}</span>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold">${amount.toFixed(2)}</p>
+                              <p className="text-xs text-gray-500">{percentage.toFixed(1)}%</p>
+                            </div>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="h-2 rounded-full transition-all duration-1000 ease-out"
+                              style={{
+                                backgroundColor: colors[index % colors.length],
+                                width: `${percentage}%`
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Yearly Projection */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold mb-6">Financial Projections</h3>
+                <div className="space-y-6">
+                  <div className="p-4 bg-red-50 rounded-xl border border-red-200">
+                    <h4 className="font-medium text-red-800 mb-2">Current Path</h4>
+                    <p className="text-3xl font-bold text-red-600">${(analytics.monthlySpend * 12).toFixed(2)}</p>
+                    <p className="text-sm text-red-600 font-medium">Annual subscription cost</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+                    <h4 className="font-medium text-green-800 mb-2">Optimized Path</h4>
+                    <p className="text-3xl font-bold text-green-600">
+                      ${((analytics.monthlySpend - analytics.potentialSavings) * 12).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-green-600 font-medium">With recommended changes</p>
+                  </div>
+                  <div className="p-6 bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 rounded-xl border-2 border-green-200">
+                    <div className="text-center">
+                      <p className="text-green-800 font-bold text-lg mb-2">
+                        💰 Total Annual Savings Potential
+                      </p>
+                      <p className="text-4xl font-bold text-green-600 mb-2">
+                        ${(analytics.potentialSavings * 12 + analytics.yearlyDiscount).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-green-700">
+                        ${analytics.potentialSavings.toFixed(2)}/month + ${analytics.yearlyDiscount.toFixed(2)} annual billing
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Tracking */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold mb-6">Savings Goal Progress</h3>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Progress to ${data.user.savingsGoal} goal</span>
+                      <span className="text-sm font-bold text-blue-600">{analytics.progressToGoal.toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-4">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${Math.min(100, analytics.progressToGoal)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-2 text-sm">
+                      <span className="text-green-600 font-medium">${data.user.totalSaved} saved</span>
+                      <span className="text-gray-600">${(data.user.savingsGoal - data.user.totalSaved).toFixed(2)} remaining</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 text-center">
+                      <h4 className="font-semibold text-blue-800 text-sm">Time Saved</h4>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {Math.round(data.emails.filter(e => e.unsubscribed).reduce((sum, e) => sum + e.emailsPerWeek * 2, 0))}
+                      </p>
+                      <p className="text-xs text-blue-600 font-medium">minutes/week</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-xl border border-purple-200 text-center">
+                      <h4 className="font-semibold text-purple-800 text-sm">Subscriptions</h4>
+                      <p className="text-2xl font-bold text-purple-600">{analytics.totalSubscriptions}</p>
+                      <p className="text-xs text-purple-600 font-medium">total managed</p>
+                    </div>
+                  </div>
+                  
+                  {analytics.progressToGoal >= 100 && (
+                    <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">🎉</div>
+                        <h4 className="font-bold text-yellow-800">Congratulations!</h4>
+                        <p className="text-sm text-yellow-700">You've reached your savings goal!</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold mb-6">Executive Summary</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl border border-blue-200">
+                    <h4 className="font-semibold text-blue-800 text-sm mb-1">Total Subscriptions</h4>
+                    <p className="text-3xl font-bold text-blue-600">{analytics.totalSubscriptions}</p>
+                    <p className="text-xs text-blue-600 mt-1">services tracked</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl border border-green-200">
+                    <h4 className="font-semibold text-green-800 text-sm mb-1">Efficiency Rate</h4>
+                    <p className="text-3xl font-bold text-green-600">
+                      {Math.round((analytics.activeSubscriptions / analytics.totalSubscriptions) * 100)}%
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">actively used</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl border border-purple-200">
+                    <h4 className="font-semibold text-purple-800 text-sm mb-1">Monthly Impact</h4>
+                    <p className="text-3xl font-bold text-purple-600">${analytics.potentialSavings.toFixed(0)}</p>
+                    <p className="text-xs text-purple-600 mt-1">savings available</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-red-100 rounded-xl border border-orange-200">
+                    <h4 className="font-semibold text-orange-800 text-sm mb-1">Email Cleanup</h4>
+                    <p className="text-3xl font-bold text-orange-600">
+                      {Math.round((data.emails.filter(e => e.unsubscribed).length / data.emails.length) * 100)}%
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">completed</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border border-indigo-200">
+                  <h4 className="font-bold text-indigo-800 mb-2">💡 Key Insights</h4>
+                  <ul className="text-sm text-indigo-700 space-y-1">
+                    <li>• You have {analytics.unusedSubscriptions + analytics.forgottenSubscriptions} subscriptions that could be optimized</li>
+                    <li>• Switching to annual billing could save an additional ${analytics.yearlyDiscount.toFixed(2)} per year</li>
+                    <li>• You're {analytics.progressToGoal.toFixed(0)}% of the way to your ${data.user.savingsGoal} savings goal</li>
+                    <li>• Email cleanup has saved you {Math.round(data.emails.filter(e => e.unsubscribed).reduce((sum, e) => sum + e.emailsPerWeek * 2, 0))} minutes per week</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Trends Section */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold mb-6">Monthly Spending Trends</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+                  <h4 className="font-semibold text-green-800 mb-2">Best Month</h4>
+                  <p className="text-2xl font-bold text-green-600">July</p>
+                  <p className="text-sm text-green-600">$86.45 spent</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl">
+                  <h4 className="font-semibold text-red-800 mb-2">Highest Month</h4>
+                  <p className="text-2xl font-bold text-red-600">March</p>
+                  <p className="text-sm text-red-600">$142.33 spent</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                  <h4 className="font-semibold text-blue-800 mb-2">Average</h4>
+                  <p className="text-2xl font-bold text-blue-600">${analytics.monthlySpend.toFixed(0)}</p>
+                  <p className="text-sm text-blue-600">monthly spending</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold mb-6 flex items-center">
+                <Target className="h-5 w-5 text-blue-500 mr-2" />
+                Personalized Recommendations
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">💡 Quick Win</h4>
+                  <p className="text-sm text-blue-700">Cancel Adobe Creative Cloud (unused for 3 months) to save $52.99/month instantly.</p>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">📈 Long-term Strategy</h4>
+                  <p className="text-sm text-green-700">Switch 4 subscriptions to annual billing to save $127.45/year in total.</p>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                  <h4 className="font-semibold text-purple-800 mb-2">🎯 Goal Focus</h4>
+                  <p className="text-sm text-purple-700">You need to save ${(data.user.savingsGoal - data.user.totalSaved).toFixed(2)} more to reach your goal.</p>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                  <h4 className="font-semibold text-yellow-800 mb-2">📧 Email Action</h4>
+                  <p className="text-sm text-yellow-700">Unsubscribe from 3 high-volume senders to save 33 minutes/week.</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>
