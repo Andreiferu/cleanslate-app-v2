@@ -3,34 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
-  // PWA Configuration
-  async headers() {
-    return [
-      {
-        source: '/manifest.json',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/manifest+json',
-          },
-        ],
-      },
-      {
-        source: '/sw.js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript',
-          },
-          {
-            key: 'Service-Worker-Allowed',
-            value: '/',
-          },
-        ],
-      },
-    ];
-  },
-
   // Enable experimental features for better PWA support
   experimental: {
     appDir: false, // Keep using pages directory
@@ -46,7 +18,7 @@ const nextConfig = {
   // Compression for better performance
   compress: true,
   
-  // Security headers
+  // Security and PWA headers
   async headers() {
     return [
       {
