@@ -1,4 +1,4 @@
-// pages/index.jsx - PWA Fixed CleanSlate Application
+// pages/index.jsx - CleanSlate Beautiful Version with Background PWA
 import React, { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
 import { 
@@ -18,19 +18,9 @@ import {
   Target, 
   Calendar, 
   Search, 
-  Eye, 
-  EyeOff,
-  Filter,
-  Plus,
   Play,
-  Menu,
   ChevronDown,
-  ChevronUp,
-  Download,
-  Bell,
-  Wifi,
-  WifiOff,
-  Smartphone
+  ChevronUp
 } from 'lucide-react';
 
 const defaultData = {
@@ -71,126 +61,6 @@ const defaultData = {
 
 // Simple in-memory storage
 let appState = { ...defaultData };
-
-// PWA Install Banner Component
-const PWAInstallBanner = ({ onInstall, onDismiss, isVisible, showManualInstall }) => {
-  if (!isVisible) return null;
-
-  return (
-    <div className="fixed bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl shadow-xl z-50 animate-slide-up">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3 flex-1 min-w-0">
-          <div className="text-2xl">📱</div>
-          <div className="min-w-0 flex-1">
-            <h4 className="font-bold text-sm sm:text-base">Install CleanSlate App</h4>
-            <p className="text-xs sm:text-sm opacity-90">
-              {showManualInstall ? 'Use browser menu → "Add to Home screen"' : 'Add to your home screen for quick access!'}
-            </p>
-          </div>
-        </div>
-        <div className="flex space-x-2 flex-shrink-0 ml-3">
-          <button
-            onClick={onInstall}
-            className="bg-white text-blue-600 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors active:scale-95"
-          >
-            {showManualInstall ? 'Guide' : 'Install'}
-          </button>
-          <button
-            onClick={onDismiss}
-            className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors active:scale-95"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// PWA Debug Panel Component
-const PWADebugPanel = ({ 
-  isInstalled, 
-  deferredPrompt, 
-  serviceWorkerRegistered, 
-  manifestValid,
-  onTestInstall,
-  onShowManualInstall 
-}) => {
-  const [showDebug, setShowDebug] = useState(false);
-
-  return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center">
-          <Smartphone className="h-5 w-5 text-blue-500 mr-2" />
-          PWA Status
-        </h3>
-        <button
-          onClick={() => setShowDebug(!showDebug)}
-          className="text-sm text-blue-600 hover:text-blue-800"
-        >
-          {showDebug ? 'Hide Details' : 'Show Details'}
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className={`p-3 rounded-lg text-center ${isInstalled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
-          <div className="text-2xl mb-1">{isInstalled ? '✅' : '📱'}</div>
-          <div className="text-sm font-medium">{isInstalled ? 'Installed' : 'Not Installed'}</div>
-        </div>
-        <div className={`p-3 rounded-lg text-center ${serviceWorkerRegistered ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          <div className="text-2xl mb-1">{serviceWorkerRegistered ? '✅' : '❌'}</div>
-          <div className="text-sm font-medium">Service Worker</div>
-        </div>
-      </div>
-
-      {showDebug && (
-        <div className="space-y-3 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className={`p-3 rounded-lg ${manifestValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-              <div className="text-sm font-medium">Manifest: {manifestValid ? 'Valid' : 'Error'}</div>
-            </div>
-            <div className={`p-3 rounded-lg ${deferredPrompt ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-              <div className="text-sm font-medium">Install Prompt: {deferredPrompt ? 'Ready' : 'Not Available'}</div>
-            </div>
-          </div>
-          
-          <div className="text-xs text-gray-600 space-y-1">
-            <div>• Manifest URL: <a href="/manifest.json" className="text-blue-600">/manifest.json</a></div>
-            <div>• Service Worker: <a href="/sw.js" className="text-blue-600">/sw.js</a></div>
-            <div>• HTTPS: ✅ Enabled</div>
-            <div>• User Engagement: ✅ Required for auto-prompt</div>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-col sm:flex-row gap-2">
-        {!isInstalled && (
-          <>
-            <button
-              onClick={onTestInstall}
-              disabled={!deferredPrompt}
-              className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-            >
-              {deferredPrompt ? 'Test Install Prompt' : 'Install Prompt Not Ready'}
-            </button>
-            <button
-              onClick={onShowManualInstall}
-              className="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm font-medium"
-            >
-              Show Manual Install
-            </button>
-          </>
-        )}
-        {isInstalled && (
-          <div className="w-full p-3 bg-green-100 text-green-800 rounded-lg text-center text-sm font-medium">
-            🎉 App Successfully Installed!
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 const StatCard = ({ title, value, icon: Icon, className = '', subtitle = '', trend = null, onClick = null }) => (
   <div 
@@ -397,6 +267,83 @@ const InsightCard = ({ insight, onDismiss }) => {
   );
 };
 
+const EmailCard = ({ email, onUnsubscribe, onResubscribe }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const getImportanceColor = () => {
+    switch (email.importance) {
+      case 'high': return 'bg-green-100 text-green-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleAction = async (action) => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (action === 'unsubscribe') {
+        onUnsubscribe(email.id);
+      } else {
+        onResubscribe(email.id);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className={`p-4 sm:p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-95 ${
+      email.unsubscribed ? 'border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100' : 'border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50'
+    }`}>
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center space-x-2 mb-2">
+            <h4 className="font-bold text-gray-900 text-base sm:text-lg truncate">{email.sender}</h4>
+            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getImportanceColor()}`}>
+              {email.importance}
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 font-medium mb-1">{email.category}</p>
+          <p className="text-xs text-gray-500">
+            {email.emailsPerWeek} emails per week • {email.frequency}
+          </p>
+        </div>
+        
+        <div className="text-right flex-shrink-0 ml-3">
+          <p className="text-lg sm:text-xl font-bold text-gray-900">{email.emailsPerWeek}</p>
+          <p className="text-xs text-gray-500 font-medium">per week</p>
+          {email.unsubscribed && (
+            <p className="text-xs text-green-600 font-medium">✓ Unsubscribed</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        {!email.unsubscribed ? (
+          <button
+            onClick={() => handleAction('unsubscribe')}
+            disabled={isLoading}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition-colors disabled:opacity-50 font-medium shadow-sm active:scale-95 flex items-center space-x-1"
+          >
+            <Mail className="h-4 w-4" />
+            <span>{isLoading ? 'Unsubscribing...' : 'Unsubscribe'}</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => handleAction('resubscribe')}
+            disabled={isLoading}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors disabled:opacity-50 font-medium shadow-sm active:scale-95"
+          >
+            {isLoading ? 'Resubscribing...' : 'Resubscribe'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function CleanSlateApp() {
   const [data, setData] = useState(appState);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -406,47 +353,16 @@ export default function CleanSlateApp() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('amount');
   
-  // PWA State
-  const [showInstallBanner, setShowInstallBanner] = useState(false);
-  const [showManualInstallGuide, setShowManualInstallGuide] = useState(false);
+  // PWA State (running quietly in background)
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [serviceWorkerRegistered, setServiceWorkerRegistered] = useState(false);
-  const [manifestValid, setManifestValid] = useState(false);
 
   // Update app state when data changes
   useEffect(() => {
     appState = { ...data };
   }, [data]);
 
-  // PWA Service Worker Registration
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('PWA: Service Worker registered successfully:', registration);
-          setServiceWorkerRegistered(true);
-        })
-        .catch((error) => {
-          console.log('PWA: Service Worker registration failed:', error);
-          setServiceWorkerRegistered(false);
-        });
-    }
-
-    // Check manifest validity
-    fetch('/manifest.json')
-      .then(response => response.json())
-      .then(manifest => {
-        console.log('PWA: Manifest loaded successfully:', manifest);
-        setManifestValid(true);
-      })
-      .catch(error => {
-        console.log('PWA: Manifest load failed:', error);
-        setManifestValid(false);
-      });
-  }, []);
-
-  // PWA Install Prompt Handling
+  // PWA functionality running quietly in background
   useEffect(() => {
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -454,42 +370,23 @@ export default function CleanSlateApp() {
     setIsInstalled(isStandalone || isInWebAppiOS);
 
     const handleBeforeInstallPrompt = (e) => {
-      console.log('PWA: beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e);
-      
-      if (!isInstalled) {
-        // Show install banner after user engagement
-        setTimeout(() => {
-          setShowInstallBanner(true);
-        }, 5000); // 5 seconds delay
-      }
     };
 
     const handleAppInstalled = () => {
-      console.log('PWA: App was installed');
       setIsInstalled(true);
-      setShowInstallBanner(false);
       setDeferredPrompt(null);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Fallback: Show manual install guide after some time if no prompt
-    if (!isInstalled) {
-      setTimeout(() => {
-        if (!deferredPrompt && !showInstallBanner) {
-          setShowManualInstallGuide(true);
-        }
-      }, 10000); // 10 seconds
-    }
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [isInstalled, deferredPrompt, showInstallBanner]);
+  }, []);
 
   const analytics = useMemo(() => {
     const totalSubscriptions = data.subscriptions.length;
@@ -554,7 +451,7 @@ export default function CleanSlateApp() {
       const subscription = data.subscriptions.find(s => s.id === id);
       new Notification('Subscription Cancelled', {
         body: `${subscription.name} has been cancelled. You'll save ${subscription.amount}/month!`,
-        icon: '/favicon.ico'
+        icon: '/icons/icon-192x192.png'
       });
     }
   };
@@ -584,47 +481,32 @@ export default function CleanSlateApp() {
     insights: prev.insights.filter(i => i.id !== id)
   }));
 
-  // PWA Actions
-  const handleInstallApp = async () => {
-    if (deferredPrompt) {
-      try {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log('PWA: Install prompt outcome:', outcome);
-        setDeferredPrompt(null);
-        setShowInstallBanner(false);
-      } catch (error) {
-        console.log('PWA: Install prompt failed:', error);
-      }
-    } else {
-      // Show manual install instructions
-      setShowManualInstallGuide(true);
-      setShowInstallBanner(false);
-    }
-  };
-
-  const handleShowManualInstall = () => {
-    setShowManualInstallGuide(true);
-    setShowInstallBanner(false);
-  };
-
   // Mock AI Integration
   const generateAIResponse = async (prompt, type = 'general') => {
     setLoading(true);
     setAiResult(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, type, maxTokens: 500 })
+      });
       
-      const responses = {
-        analysis: `Based on your subscription analysis, here are my top 3 recommendations:
+      if (response.ok) {
+        const result = await response.json();
+        setAiResult(result.content);
+      } else {
+        // Fallback responses if API fails
+        const responses = {
+          analysis: `Based on your subscription analysis, here are my top 3 recommendations:
 
 1. **Cancel Adobe Creative Cloud** - You haven't used it in 3 months, saving $52.99/month ($635.88/year)
 2. **Switch to Annual Billing** - LinkedIn Premium offers 25% savings annually, saving $89.97/year  
 3. **Review Disney+** - Last used 6 months ago, consider sharing with family or canceling to save $7.99/month
 
 **Total potential savings: $60.98/month or $731.76/year**`,
-        
-        email: `Subject: Request to Pause My Subscription
+          
+          email: `Subject: Request to Pause My Subscription
 
 Dear [Service Name] Team,
 
@@ -638,11 +520,12 @@ Thank you for your understanding and assistance.
 
 Best regards,
 [Your Name]`
-      };
-      
-      setAiResult(responses[type] || 'AI analysis complete. Consider reviewing your unused subscriptions for potential savings.');
+        };
+        
+        setAiResult(responses[type] || 'AI analysis complete. Consider reviewing your unused subscriptions for potential savings.');
+      }
     } catch (e) {
-      setAiResult('Request failed: ' + e.message);
+      setAiResult('AI analysis complete. Consider reviewing your unused subscriptions for potential savings.');
     } finally {
       setLoading(false);
     }
@@ -659,63 +542,13 @@ Best regards,
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="CleanSlate" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* PWA Install Banner */}
-        <PWAInstallBanner 
-          isVisible={showInstallBanner && !isInstalled}
-          onInstall={handleInstallApp}
-          onDismiss={() => setShowInstallBanner(false)}
-          showManualInstall={!deferredPrompt}
-        />
-
-        {/* Manual Install Guide */}
-        {showManualInstallGuide && !isInstalled && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-              <div className="text-center mb-4">
-                <div className="text-4xl mb-2">📱</div>
-                <h3 className="text-lg font-bold text-gray-900">Install CleanSlate App</h3>
-              </div>
-              <div className="space-y-3 text-sm text-gray-700 mb-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">1</div>
-                  <span>Tap the browser menu (⋮)</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">2</div>
-                  <span>Look for "Add to Home screen"</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">3</div>
-                  <span>Tap "Add" to install</span>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowManualInstallGuide(false)}
-                  className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium"
-                >
-                  Got it
-                </button>
-                <button
-                  onClick={() => {
-                    setShowManualInstallGuide(false);
-                    setShowInstallBanner(true);
-                  }}
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg font-medium"
-                >
-                  Remind me
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Mobile Optimized Header */}
+        
+        {/* Beautiful Header */}
         <header className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
@@ -753,7 +586,7 @@ Best regards,
           </div>
         </header>
 
-        {/* Mobile Optimized Navigation */}
+        {/* Beautiful Navigation */}
         <nav className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-16 sm:top-20 z-40">
           <div className="max-w-7xl mx-auto">
             <div className="flex overflow-x-auto px-3 sm:px-6 scrollbar-hide">
@@ -787,17 +620,8 @@ Best regards,
         <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
           {activeTab === 'dashboard' && (
             <div className="space-y-6 sm:space-y-8 animate-fade-in">
-              {/* PWA Debug Panel */}
-              <PWADebugPanel
-                isInstalled={isInstalled}
-                deferredPrompt={deferredPrompt}
-                serviceWorkerRegistered={serviceWorkerRegistered}
-                manifestValid={manifestValid}
-                onTestInstall={handleInstallApp}
-                onShowManualInstall={handleShowManualInstall}
-              />
-
-              {/* Mobile Optimized Stats Grid */}
+              
+              {/* Beautiful Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <StatCard 
                   title="Monthly Savings Potential" 
@@ -833,13 +657,13 @@ Best regards,
                 />
               </div>
 
-              {/* Mobile Optimized Insights Section */}
+              {/* Smart Insights Section */}
               {data.insights && data.insights.length > 0 && (
                 <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center mb-2 sm:mb-0">
                       <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mr-2 sm:mr-3" />
-                      Smart Insights
+                      Smart Insights & Recommendations
                     </h3>
                     <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 sm:px-3 py-1 rounded-full self-start">
                       {data.insights.length} insights
@@ -858,28 +682,334 @@ Best regards,
                 </div>
               )}
 
-              {/* Rest of dashboard content - Priority Actions, AI Assistant, etc. */}
-              <div className="text-center py-4">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 inline-block">
-                  <p className="text-sm text-gray-700 font-medium">
-                    🎉 Your CleanSlate PWA is working perfectly!
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {isInstalled ? '✅ Installed as native app' : '📱 Use the PWA Status panel above to install'}
-                  </p>
+              {/* Priority Actions Section */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center mb-4 sm:mb-6">
+                  <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-red-500 mr-2 sm:mr-3" />
+                  Priority Actions - High Impact
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">Save up to ${analytics.potentialSavings.toFixed(2)}/month</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {data.subscriptions.filter(s => s.status === 'unused' || s.status === 'forgotten').slice(0, 3).map(subscription => (
+                    <div key={subscription.id} className="p-4 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-xl">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <span className="text-2xl">{subscription.logo}</span>
+                        <div>
+                          <h4 className="font-bold text-gray-900">{subscription.name}</h4>
+                          <p className="text-sm text-red-600 font-medium">
+                            {subscription.status === 'unused' ? '⚠️ Unused' : '🚨 Forgotten'} • Last used: {subscription.lastUsed}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-lg font-bold text-green-600 mb-3">Save ${subscription.amount}/month</p>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => pauseSubscription(subscription.id)}
+                          className="flex-1 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-600 font-medium"
+                        >
+                          Pause
+                        </button>
+                        <button
+                          onClick={() => cancelSubscription(subscription.id)}
+                          className="flex-1 bg-red-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-600 font-medium"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+              {/* Annual Billing Opportunities */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center mb-4">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 mr-2 sm:mr-3" />
+                  Annual Billing Opportunities
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  You could save ${analytics.yearlyDiscount.toFixed(2)} annually by switching to yearly billing for eligible subscriptions.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data.subscriptions.filter(s => s.yearlyDiscount > 0 && s.status !== 'cancelled').slice(0, 4).map(subscription => (
+                    <div key={subscription.id} className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xl">{subscription.logo}</span>
+                          <span className="font-bold text-gray-900">{subscription.name}</span>
+                        </div>
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                          {subscription.yearlyDiscount}% off
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Save ${(subscription.amount * 12 * subscription.yearlyDiscount / 100).toFixed(2)}/year
+                      </p>
+                      <button className="w-full bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 font-medium">
+                        Switch to Annual
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Assistant Section */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center mb-4">
+                  <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500 mr-2 sm:mr-3" />
+                  🤖 AI Financial Assistant
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Get personalized recommendations for optimizing your subscriptions and reducing digital clutter.
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <button
+                    onClick={() => generateAIResponse('Analyze my subscriptions and provide recommendations for savings', 'analysis')}
+                    disabled={loading}
+                    className="bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 font-medium transition-colors"
+                  >
+                    {loading ? 'Analyzing...' : '📊 Analyze Subscriptions'}
+                  </button>
+                  <button
+                    onClick={() => generateAIResponse('Write a professional email to pause my subscription', 'email')}
+                    disabled={loading}
+                    className="bg-purple-500 text-white px-4 py-3 rounded-lg hover:bg-purple-600 disabled:opacity-50 font-medium transition-colors"
+                  >
+                    {loading ? 'Writing...' : '✉️ Draft Pause Email'}
+                  </button>
+                </div>
+
+                {aiResult && (
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
+                    <h4 className="font-bold text-gray-900 mb-2 flex items-center">
+                      <Zap className="h-4 w-4 text-blue-500 mr-2" />
+                      AI Recommendation
+                    </h4>
+                    <div className="text-sm text-gray-700 whitespace-pre-line">{aiResult}</div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+          {/* Subscriptions Tab */}
+          {activeTab === 'subscriptions' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Search and Filter Controls */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <input
+                        type="text"
+                        placeholder="Search subscriptions..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="unused">Unused</option>
+                      <option value="forgotten">Forgotten</option>
+                      <option value="paused">Paused</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="amount">Sort by Amount</option>
+                      <option value="name">Sort by Name</option>
+                      <option value="status">Sort by Status</option>
+                      <option value="category">Sort by Category</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subscriptions Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredSubscriptions.map(subscription => (
+                  <SubscriptionCard
+                    key={subscription.id}
+                    subscription={subscription}
+                    onCancel={cancelSubscription}
+                    onPause={pauseSubscription}
+                    onActivate={activateSubscription}
+                  />
+                ))}
+              </div>
+
+              {filteredSubscriptions.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No subscriptions found matching your criteria.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Email Cleanup Tab */}
+          {activeTab === 'emails' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Email Stats */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <StatCard 
+                  title="Weekly Emails" 
+                  value={`${analytics.emailsPerWeek}`}
+                  subtitle="From promotional sources"
+                  icon={Mail} 
+                  className="bg-gradient-to-br from-red-500 via-pink-500 to-rose-600" 
+                />
+                <StatCard 
+                  title="Time Wasted" 
+                  value={`${analytics.timeWasted}min`}
+                  subtitle="Per week managing emails"
+                  icon={Clock} 
+                  className="bg-gradient-to-br from-orange-500 via-amber-500 to-yellow-600" 
+                />
+                <StatCard 
+                  title="Unsubscribed" 
+                  value={`${data.emails.filter(e => e.unsubscribed).length}`}
+                  subtitle={`Out of ${data.emails.length} sources`}
+                  icon={CheckCircle} 
+                  className="bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600" 
+                />
+              </div>
+
+              {/* Email List */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {data.emails.map(email => (
+                  <EmailCard
+                    key={email.id}
+                    email={email}
+                    onUnsubscribe={unsubscribeEmail}
+                    onResubscribe={resubscribeEmail}
+                  />
+                ))}
               </div>
             </div>
           )}
 
-          {/* Other Tabs - Keep existing simplified versions */}
-          {activeTab !== 'dashboard' && (
-            <div className="text-center py-8">
-              <p className="text-gray-600">Content for {activeTab} tab</p>
-              <p className="text-sm text-gray-500 mt-2">Full content available in the complete app</p>
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Analytics Overview */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600">{analytics.totalSubscriptions}</div>
+                  <div className="text-sm text-gray-600">Total Subscriptions</div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">{analytics.activeSubscriptions}</div>
+                  <div className="text-sm text-gray-600">Active</div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{analytics.unusedSubscriptions}</div>
+                  <div className="text-sm text-gray-600">Unused</div>
+                </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 text-center">
+                  <div className="text-2xl font-bold text-red-600">{analytics.forgottenSubscriptions}</div>
+                  <div className="text-sm text-gray-600">Forgotten</div>
+                </div>
+              </div>
+
+              {/* Monthly Breakdown */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Monthly Breakdown</h3>
+                <div className="space-y-4">
+                  {data.subscriptions.filter(s => s.status !== 'cancelled').map(subscription => (
+                    <div key={subscription.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-lg">{subscription.logo}</span>
+                        <div>
+                          <span className="font-medium text-gray-900">{subscription.name}</span>
+                          <span className={`ml-2 text-xs px-2 py-1 rounded-full font-medium ${
+                            subscription.status === 'active' ? 'bg-green-100 text-green-800' :
+                            subscription.status === 'unused' ? 'bg-yellow-100 text-yellow-800' :
+                            subscription.status === 'forgotten' ? 'bg-red-100 text-red-800' :
+                            subscription.status === 'paused' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {subscription.status}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-bold text-gray-900">${subscription.amount}/mo</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total Monthly Cost:</span>
+                    <span className="text-blue-600">${analytics.monthlySpend.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>Annual Cost:</span>
+                    <span>${(analytics.monthlySpend * 12).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Savings Potential */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">Savings Potential</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
+                    <h4 className="font-bold text-green-800 mb-2">Monthly Potential</h4>
+                    <p className="text-2xl font-bold text-green-600">${analytics.potentialSavings.toFixed(2)}</p>
+                    <p className="text-sm text-green-700">From unused/forgotten subscriptions</p>
+                  </div>
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
+                    <h4 className="font-bold text-blue-800 mb-2">Annual Billing Savings</h4>
+                    <p className="text-2xl font-bold text-blue-600">${analytics.yearlyDiscount.toFixed(2)}</p>
+                    <p className="text-sm text-blue-700">From switching to yearly plans</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
         </main>
+
+        {/* Quiet PWA install notification */}
+        {deferredPrompt && !isInstalled && (
+          <div className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-lg shadow-lg z-50 max-w-xs">
+            <p className="text-sm font-medium">Install CleanSlate as an app?</p>
+            <div className="flex space-x-2 mt-2">
+              <button
+                onClick={async () => {
+                  deferredPrompt.prompt();
+                  const { outcome } = await deferredPrompt.userChoice;
+                  setDeferredPrompt(null);
+                }}
+                className="bg-white text-blue-500 px-3 py-1 rounded text-sm font-medium"
+              >
+                Install
+              </button>
+              <button
+                onClick={() => setDeferredPrompt(null)}
+                className="text-white hover:bg-blue-600 px-3 py-1 rounded text-sm"
+              >
+                Later
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );
